@@ -54,17 +54,37 @@ where
 | "koTypeOf (KOKernelData) = KernelDataT"
 | "koTypeOf (KOArch e) = ArchT (archTypeOf e)"
 
+(* FIXME: move *)
+definition ounless :: "bool \<Rightarrow> unit kernel_r \<Rightarrow> unit kernel_r"
+where "ounless P f \<equiv> if P then oreturn () else f"
+
+(* FIXME: move *)
+definition owhen :: "bool \<Rightarrow> unit kernel_r \<Rightarrow> unit kernel_r"
+where "owhen P f \<equiv> if P then f else oreturn ()"
+
+definition
+  read_typeError :: "unit list \<Rightarrow> kernel_object \<Rightarrow> 'a kernel_r" where
+  "read_typeError t1 t2 \<equiv> ofail"
+
 definition
   typeError :: "unit list \<Rightarrow> kernel_object \<Rightarrow> 'a kernel" where
   "typeError t1 t2 \<equiv> fail"
+
+definition
+  read_alignError :: "nat \<Rightarrow> 'a kernel_r" where
+  "read_alignError n \<equiv> ofail"
 
 definition
   alignError :: "nat \<Rightarrow> 'a kernel" where
   "alignError n \<equiv> fail"
 
 definition
+  read_alignCheck :: "machine_word \<Rightarrow> nat \<Rightarrow> unit kernel_r" where
+  "read_alignCheck x n \<equiv> ounless ((x && mask n) = 0) $ read_alignError n"
+
+definition
   alignCheck :: "machine_word \<Rightarrow> nat \<Rightarrow> unit kernel" where
-  "alignCheck x n \<equiv> unless ((x && mask n) = 0) $ alignError n"
+  "alignCheck x n \<equiv> gets_the $ read_alignCheck x n"
 
 
 definition
