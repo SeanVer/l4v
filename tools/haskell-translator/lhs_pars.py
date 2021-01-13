@@ -1902,9 +1902,14 @@ option_m_map = {
     'return': 'oreturn',
     'assert': 'oassert',
     'fail': 'ofail',
+    'when': 'owhen',
+    'unless': 'ounless',
     'liftM': 'oliftM',
     'maybeToMonad': 'oassert_opt',
-    'magnitudeCheck': 'read_magnitudeCheck'
+    'magnitudeCheck': 'read_magnitudeCheck',
+    'alignCheck': 'read_alignCheck',
+    'alignError': 'read_alignError',
+    'typeError': 'read_typeError'
 }
 
 monad_op_map = {
