@@ -1904,8 +1904,8 @@ syscall_m_map = {k:v+"E" for (k,v) in error_m_map.items()}
 
 option_m_map = {
     'return': 'oreturn',
-    'assert': 'oassert',
-    'fail': 'ofail',
+    'assert': 'ohaskell_assert',
+    'fail': 'ohaskell_fail',
     'when': 'owhen',
     'unless': 'ounless',
     'liftM': 'oliftM',
