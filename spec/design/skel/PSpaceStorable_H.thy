@@ -62,6 +62,14 @@ where "ounless P f \<equiv> if P then oreturn () else f"
 definition owhen :: "bool \<Rightarrow> unit kernel_r \<Rightarrow> unit kernel_r"
 where "owhen P f \<equiv> if P then f else oreturn ()"
 
+(* FIXME: move *)
+definition ohaskell_fail :: "unit list \<Rightarrow> unit kernel_r" where
+  "ohaskell_fail ls = K None"
+
+(* FIXME: move *)
+definition ohaskell_assert :: "bool \<Rightarrow> unit list \<Rightarrow> unit kernel_r" where
+  "ohaskell_assert P ls \<equiv> if P then oreturn () else ofail"
+
 definition
   read_typeError :: "unit list \<Rightarrow> kernel_object \<Rightarrow> 'a kernel_r" where
   "read_typeError t1 t2 \<equiv> ofail"
