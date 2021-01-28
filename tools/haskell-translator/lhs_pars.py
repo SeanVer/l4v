@@ -1189,7 +1189,11 @@ def pspace_storable_instance_proofs(header, canonical, d):
     extradefs.extend(['', 'definition', ])
     if 'loadObject' in defs:
         extradefs.append('  loadObject_%s:' % header)
-        extradefs.extend(flatten_tree(defs['loadObject'].body))
+        body = flatten_tree(defs['loadObject'].body)
+        bits = body[0].split('loadObject')
+        bits = bits[1].split('\<equiv>')
+        body[0] = '"(loadObject %s) :: %s kernel_r \<equiv>' % (bits[0], header)
+        extradefs.extend(body)
     else:
         extradefs.extend([
             '  loadObject_%s[simp]:' % header,
@@ -1906,10 +1910,11 @@ option_m_map = {
     'unless': 'ounless',
     'liftM': 'oliftM',
     'maybeToMonad': 'oassert_opt',
-    'magnitudeCheck': 'read_magnitudeCheck',
     'alignCheck': 'read_alignCheck',
     'alignError': 'read_alignError',
-    'typeError': 'read_typeError'
+    'typeError': 'read_typeError',
+    'magnitudeCheck': 'read_magnitudeCheck',
+    'magnitudeCheck': 'read_magnitudeCheck'
 }
 
 monad_op_map = {
@@ -2218,7 +2223,7 @@ regexes = [
     (re.compile(r"//"), ' aLU '),
     (re.compile('otherwise'), 'True     '),
     (re.compile(r"(^|\W)fail "), r"\1haskell_fail "),
-    (re.compile('assert '), 'haskell_assert '),
+    (re.compile('^assert '), 'haskell_assert '),
     (re.compile('assertE '), 'haskell_assertE '),
     (re.compile('=='), '='),
     (re.compile(r"\(/="), '(\<lambda>x. x \<noteq>'),
