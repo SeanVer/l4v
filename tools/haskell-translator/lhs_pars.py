@@ -2225,7 +2225,7 @@ regexes = [
     (re.compile(r"//"), ' aLU '),
     (re.compile('otherwise'), 'True     '),
     (re.compile(r"(^|\W)fail "), r"\1haskell_fail "),
-    (re.compile('^assert '), 'haskell_assert '),
+    (re.compile('(?<!_)assert '), 'haskell_assert '),
     (re.compile('assertE '), 'haskell_assertE '),
     (re.compile('=='), '='),
     (re.compile(r"\(/="), '(\<lambda>x. x \<noteq>'),
