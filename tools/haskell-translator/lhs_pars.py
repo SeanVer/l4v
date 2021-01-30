@@ -1482,7 +1482,6 @@ def body_transform(body, defined, sig, nopattern=False):
     if children and (children[-1][0].endswith('where') or
                      children[-1][0].lstrip().startswith('where')):
         bits = line.split('\<equiv>')
-
         where_clause = where_clause_transform(children[-1], type)
         children = children[:-1]
         if len(bits) == 2 and bits[1].strip():
@@ -1647,7 +1646,6 @@ def where_clause_transform(line_and_children, type=None):
 
     children = [(l, c) for (l, c) in children if l.split()[1] != '::']
     children = [case_clauses_transform((l, c)) for (l, c) in children]
-
     children = [do_clauses_transform(
         (l, c),
         None,
@@ -1918,7 +1916,7 @@ option_m_map = {
     'alignCheck': 'read_alignCheck',
     'alignError': 'read_alignError',
     'typeError': 'read_typeError',
-    'magnitudeCheck': 'read_magnitudeCheck'
+    'sizeCheck': 'read_magnitudeCheck'
 }
 
 monad_op_map = {
