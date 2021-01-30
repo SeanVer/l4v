@@ -63,7 +63,7 @@ definition owhen :: "bool \<Rightarrow> unit kernel_r \<Rightarrow> unit kernel_
 where "owhen P f \<equiv> if P then f else oreturn ()"
 
 (* FIXME: move *)
-definition ohaskell_fail :: "unit list \<Rightarrow> unit kernel_r" where
+definition ohaskell_fail :: "unit list \<Rightarrow> 'a kernel_r" where
   "ohaskell_fail ls = K None"
 
 (* FIXME: move *)
