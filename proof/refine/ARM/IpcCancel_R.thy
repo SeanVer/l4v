@@ -147,7 +147,7 @@ lemma invs_weak_sch_act_wf[elim!]:
 (* FIXME RT: move to TcbAcc_R and replace gts_wf' with this *)
 lemma gts_wf''[wp]:
   "\<lbrace>valid_objs'\<rbrace> getThreadState t \<lbrace>valid_tcb_state'\<rbrace>"
-  apply (simp add: getThreadState_def threadGet_def liftM_def)
+  apply (simp add: getThreadState_def threadGet_getObject liftM_def)
   apply (wp getObject_tcb_wp)
   apply clarsimp
   apply (drule obj_at_ko_at', clarsimp)
@@ -1194,11 +1194,11 @@ lemma setQueue_after_addToBitmap:
    apply (simp add: setQueue_after)
   apply (simp add: setQueue_def when_def)
   apply (subst oblivious_modify_swap)
-  apply (simp add: threadSet_def getObject_def setObject_def
-                   loadObject_default_def bitmap_fun_defs
-                   split_def projectKO_def2 alignCheck_assert
-                   magnitudeCheck_assert updateObject_default_def)
-  apply (intro oblivious_bind, simp_all)
+  apply (simp add: threadSet_def getObject_def setObject_def readObject_def
+                   loadObject_default_def bitmap_fun_defs gets_the_def in_omonad
+                   split_def projectKO_def alignCheck_assert read_magnitudeCheck_assert
+                   magnitudeCheck_assert updateObject_default_def obind_def)
+  apply (intro oblivious_bind, simp_all split: option.splits)
   apply (clarsimp simp: bind_assoc)
   done
 
@@ -3613,7 +3613,7 @@ lemma suspend_unqueued:
   "\<lbrace>\<top>\<rbrace> suspend t \<lbrace>\<lambda>rv. obj_at' (Not \<circ> tcbQueued) t\<rbrace>"
   apply (simp add: suspend_def unless_def tcbSchedDequeue_def)
   apply (wp hoare_vcg_if_lift hoare_vcg_conj_lift hoare_vcg_imp_lift)
-          apply (wpsimp simp: threadGet_def comp_def wp: getObject_tcb_wp)+
+          apply (wpsimp simp: threadGet_getObject comp_def wp: getObject_tcb_wp)+
       apply (rule hoare_strengthen_post, rule hoare_post_taut)
       apply (fastforce simp: obj_at'_def projectKOs)
      apply (rule hoare_post_taut)
