@@ -1195,7 +1195,7 @@ lemma setQueue_after_addToBitmap:
   apply (simp add: setQueue_def when_def)
   apply (subst oblivious_modify_swap)
   apply (simp add: threadSet_def getObject_def setObject_def readObject_def
-                   loadObject_default_def bitmap_fun_defs gets_the_def in_omonad
+                   loadObject_default_def bitmap_fun_defs gets_the_def omonad_defs
                    split_def projectKO_def alignCheck_assert read_magnitudeCheck_assert
                    magnitudeCheck_assert updateObject_default_def obind_def)
   apply (intro oblivious_bind, simp_all split: option.splits)
@@ -1299,9 +1299,7 @@ lemma valid_queues_inQ_queues:
 
 lemma asUser_tcbQueued_inv[wp]:
   "\<lbrace>obj_at' (\<lambda>tcb. P (tcbQueued tcb)) t'\<rbrace> asUser t m \<lbrace>\<lambda>_. obj_at' (\<lambda>tcb. P (tcbQueued tcb)) t'\<rbrace>"
-  apply (simp add: asUser_def tcb_in_cur_domain'_def threadGet_def)
-  apply (wp threadSet_obj_at'_strongish getObject_tcb_wp | wpc | simp | clarsimp simp: obj_at'_def)+
-  done
+  by (wpsimp wp: getObject_tcb_wp simp: obj_at'_def asUser_def tcb_in_cur_domain'_def threadGet_getObject)
 
 lemma asUser_valid_inQ_queues[wp]:
   "\<lbrace> valid_inQ_queues \<rbrace> asUser t f \<lbrace>\<lambda>rv. valid_inQ_queues \<rbrace>"
@@ -3182,16 +3180,11 @@ lemma rescheduleRequired_unlive[wp]:
   "\<lbrace>\<lambda>s. ko_wp_at' (Not \<circ> live') p s \<and> sch_act_not p s\<rbrace>
    rescheduleRequired
    \<lbrace>\<lambda>_. ko_wp_at' (Not \<circ> live') p\<rbrace>"
-  apply (simp add: rescheduleRequired_def)
-  apply (wp | simp | wpc)+
-   apply (simp add: tcbSchedEnqueue_def unless_def
-                    threadSet_def setQueue_def threadGet_def)
-   apply (wpsimp wp: setObject_ko_wp_at getObject_tcb_wp isSchedulable_wp
-               simp: objBits_simps' bitmap_fun_defs)+
-  apply (clarsimp simp: o_def)
-  apply (drule obj_at_ko_at')
-  apply clarsimp
-  done
+  unfolding rescheduleRequired_def
+  apply (wpsimp wp: setObject_ko_wp_at getObject_tcb_wp isSchedulable_wp
+              simp: objBits_simps' bitmap_fun_defs tcbSchedEnqueue_def unless_def
+                    threadSet_def setQueue_def threadGet_getObject)+
+  by (fastforce simp: o_def dest!: obj_at_ko_at'[where P=\<top>])
 
 lemma tcbSchedEnqueue_unlive_other:
   "\<lbrace>ko_wp_at' (Not \<circ> live') p and K (p \<noteq> t)\<rbrace>

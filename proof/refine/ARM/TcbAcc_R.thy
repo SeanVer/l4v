@@ -548,11 +548,6 @@ lemma assert_get_tcb_corres:
   apply assumption
   done
 
-schematic_goal threadGet_getObject:
-  "threadGet f t = ?x"
-  apply (simp add: threadGet_def threadRead_def oliftM_def getObject_def[symmetric])
-  done
-
 lemma threadget_corres:
   assumes x: "\<And>tcb tcb'. tcb_relation tcb tcb' \<Longrightarrow> r (f tcb) (f' tcb')"
   shows      "corres r (tcb_at t) (tcb_at' t) (thread_get f t) (threadGet f' t)"
@@ -1750,7 +1745,7 @@ proof -
     apply (clarsimp simp: valid_def in_monad getObject_def readObject_def setObject_def
                           loadObject_default_def projectKOs objBits_simps'
                           modify_def split_def updateObject_default_def
-                          in_magnitude_check select_f_def in_omonad obind_def
+                          in_magnitude_check select_f_def omonad_defs obind_def
                split del: if_split
                    split: option.split_asm if_split_asm
                    dest!: P)
@@ -1899,23 +1894,18 @@ crunches asUser
 
 lemma asUser_tcb_in_cur_domain'[wp]:
   "\<lbrace>tcb_in_cur_domain' t'\<rbrace> asUser t m \<lbrace>\<lambda>_. tcb_in_cur_domain' t'\<rbrace>"
-  apply (simp add: asUser_def tcb_in_cur_domain'_def threadGet_def)
-  apply (wp | wpc | simp)+
-     apply (rule_tac f="ksCurDomain" in hoare_lift_Pf)
-      apply (wp threadSet_obj_at'_strongish getObject_tcb_wp | simp)+
-  done
+  unfolding asUser_def tcb_in_cur_domain'_def threadGet_getObject
+  by (wpsimp wp: threadSet_obj_at'_strongish getObject_tcb_wp | wps | clarsimp simp: obj_at'_def)+
 
 lemma asUser_tcbDomain_inv[wp]:
   "\<lbrace>obj_at' (\<lambda>tcb. P (tcbDomain tcb)) t'\<rbrace> asUser t m \<lbrace>\<lambda>_. obj_at' (\<lambda>tcb. P (tcbDomain tcb)) t'\<rbrace>"
-  apply (simp add: asUser_def tcb_in_cur_domain'_def threadGet_def)
-  apply (wp threadSet_obj_at'_strongish getObject_tcb_wp | wpc | simp | clarsimp simp: obj_at'_def)+
-  done
+  unfolding asUser_def tcb_in_cur_domain'_def threadGet_getObject
+  by (wpsimp wp: threadSet_obj_at'_strongish getObject_tcb_wp | wps | clarsimp simp: obj_at'_def)+
 
 lemma asUser_tcbPriority_inv[wp]:
   "\<lbrace>obj_at' (\<lambda>tcb. P (tcbPriority tcb)) t'\<rbrace> asUser t m \<lbrace>\<lambda>_. obj_at' (\<lambda>tcb. P (tcbPriority tcb)) t'\<rbrace>"
-  apply (simp add: asUser_def tcb_in_cur_domain'_def threadGet_def)
-  apply (wp threadSet_obj_at'_strongish getObject_tcb_wp | wpc | simp | clarsimp simp: obj_at'_def)+
-  done
+  unfolding asUser_def tcb_in_cur_domain'_def threadGet_getObject
+  by (wpsimp wp: threadSet_obj_at'_strongish getObject_tcb_wp | wps | clarsimp simp: obj_at'_def)+
 
 lemma asUser_sch_act_wf[wp]:
   "\<lbrace>\<lambda>s. sch_act_wf (ksSchedulerAction s) s\<rbrace>
@@ -3194,7 +3184,7 @@ lemma setQueue_after:
   apply (simp add: setQueue_def)
   apply (rule oblivious_modify_swap)
   apply (simp add: threadSet_def getObject_def setObject_def obind_def
-                   loadObject_default_def gets_the_def in_omonad read_magnitudeCheck_assert
+                   loadObject_default_def gets_the_def omonad_defs read_magnitudeCheck_assert
                    split_def projectKO_def alignCheck_assert readObject_def
                    magnitudeCheck_assert updateObject_default_def
             split: option.splits if_splits)

@@ -820,7 +820,7 @@ lemma capBadge_maskCapRights[simp]:
 lemma getObject_cte_det:
   "(r::cte,s') \<in> fst (getObject p s) \<Longrightarrow> fst (getObject p s) = {(r,s)} \<and> s' = s"
   by (clarsimp simp: getObject_def in_monad split_def obind_def gets_def get_def
-                     readObject_def in_omonad bind_def return_def gets_the_def assert_opt_def
+                     readObject_def omonad_defs bind_def return_def gets_the_def assert_opt_def
               split: option.splits)
 
 lemma cte_wp_at_obj_cases':

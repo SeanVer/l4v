@@ -183,16 +183,16 @@ lemma can_be_is:
   apply (auto simp: Let_def)[1]
   done
 
-lemma no_fail_r_cte_wp_at'_readObject[simp]:
-  "no_fail_r (cte_wp_at' (P::cte \<Rightarrow> bool) p) (readObject p::cte kernel_r)"
-  by (clarsimp simp: cte_wp_at'_def getObject_def readObject_def obind_def in_omonad split_def
-                     no_fail_r_def gets_the_def gets_def get_def bind_def
+lemma no_ofail_cte_wp_at'_readObject[simp]:
+  "no_ofail (cte_wp_at' (P::cte \<Rightarrow> bool) p) (readObject p::cte kernel_r)"
+  by (clarsimp simp: cte_wp_at'_def getObject_def readObject_def obind_def omonad_defs split_def
+                     no_ofail_def gets_the_def gets_def get_def bind_def
                      return_def assert_opt_def fail_def
               split: option.splits)
 
 lemma no_fail_getObject [wp]:
   "no_fail (cte_at' p) (getObject p::cte kernel)"
-  by (clarsimp simp: getCTE_def getObject_def)
+  by (clarsimp simp: getCTE_def getObject_def no_ofail_gets_the)
 
 lemma no_fail_getCTE [wp]:
   "no_fail (cte_at' p) (getCTE p)"
@@ -2188,12 +2188,12 @@ lemma ctes_of_valid:
 lemma readObject_cte_at'[simplified]:
   "bound (readObject p s :: cte option) \<Longrightarrow> cte_at' p s"
   unfolding cte_wp_at'_def getObject_def
-  by (clarsimp simp: in_omonad split_def gets_the_def exec_gets return_def)
+  by (clarsimp simp: omonad_defs split_def gets_the_def exec_gets return_def)
 
 lemma readObject_cte_ko_at':
   "readObject p s = Some (cte :: cte) \<Longrightarrow> cte_wp_at' ((=) cte) p s"
   unfolding cte_wp_at'_def getObject_def
-  by (clarsimp simp: in_omonad split_def gets_the_def exec_gets return_def)
+  by (clarsimp simp: omonad_defs split_def gets_the_def exec_gets return_def)
 
 lemma no_fail_setObject_cte [wp]:
   "no_fail (cte_at' t) (setObject t (t'::cte))"
@@ -2202,12 +2202,12 @@ lemma no_fail_setObject_cte [wp]:
              split del: if_split cong: kernel_object.case_cong)
   apply (wp|wpc)+
   apply (clarsimp simp: cte_wp_at'_def getObject_def split_def
-                        in_monad loadObject_cte readObject_def in_omonad
+                        in_monad loadObject_cte readObject_def omonad_defs
                  dest!: in_singleton split: option.splits split del: if_split)
   by (fastforce simp: read_typeError_def objBits_simps
                       read_magnitudeCheck_def ohaskell_assert_def
-              split: kernel_object.split_asm if_split_asm
-          split del: if_split)
+               split: kernel_object.split_asm if_split_asm
+           split del: if_split)
 
 lemma no_fail_setCTE [wp]:
   "no_fail (cte_at' p) (setCTE p c)"

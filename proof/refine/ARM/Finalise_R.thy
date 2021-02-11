@@ -3781,7 +3781,7 @@ lemma setQueue_after_removeFromBitmap:
    apply (fastforce simp: threadSet_def getObject_def setObject_def readObject_def
                           loadObject_default_def bitmap_fun_defs gets_the_def obind_def
                           split_def projectKO_def alignCheck_assert read_magnitudeCheck_assert
-                          magnitudeCheck_assert updateObject_default_def in_omonad
+                          magnitudeCheck_assert updateObject_default_def omonad_defs
                    intro: oblivious_bind split: option.splits)
   apply clarsimp
   done

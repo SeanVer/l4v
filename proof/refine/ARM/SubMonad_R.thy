@@ -68,8 +68,8 @@ lemma threadGet_stateAssert_gets_asUser:
    apply (simp add: threadGet_def liftM_def, wp getObject_tcb_at',
           clarsimp simp: threadRead_tcb_at')
   apply (wpsimp simp: threadGet_def)
-  apply (drule ovalid_threadRead_sp[rule_format], fastforce)
-  apply (clarsimp simp: obj_at'_def asUser_fetch_def projectKOs atcbContextGet_def o_def)+
+  apply (drule use_ovalid[OF ovalid_threadRead_sp], simp)
+  apply (clarsimp simp: obj_at'_def asUser_fetch_def projectKOs atcbContextGet_def o_def)
   done
 
 lemma threadSet_modify_asUser:

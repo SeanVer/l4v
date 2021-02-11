@@ -2189,11 +2189,11 @@ lemma cte_wp_at_top:
    = (\<exists>a b. fst (lookupAround2 src (ksPSpace s)) = Some (a, b) \<and>
             cte_check b src a (snd (lookupAround2 src (ksPSpace s))))"
   apply (simp add: cte_wp_at'_def getObject_def gets_def get_def bind_def return_def split_def
-                   assert_opt_def fail_def gets_the_def readObject_def in_omonad obind_def
+                   assert_opt_def fail_def gets_the_def readObject_def omonad_defs obind_def
             split: option.splits)
   apply (clarsimp simp: loadObject_cte)
   by (case_tac b;
-      simp add: typeError_def read_typeError_def obind_def in_omonad cte_check_def
+      simp add: typeError_def read_typeError_def obind_def omonad_defs cte_check_def
                 read_alignCheck_def read_magnitudeCheck_def read_alignError_def is_aligned_mask
                 objBits_simps tcbSlot_defs cteSizeBits_def
          split: option.split;
@@ -2454,7 +2454,7 @@ lemma locateCTE_cte_no_fail:
  "no_fail (cte_at' src) (locateCTE src)"
   apply (clarsimp simp: no_fail_def cte_wp_at'_def getObject_def
                         locateCTE_def return_def gets_def get_def bind_def split_def
-                        gets_the_def readObject_def in_omonad obind_def
+                        gets_the_def readObject_def omonad_defs obind_def
                         assert_opt_def assert_def fail_set
                  split: option.splits)
   apply (clarsimp simp:cte_check_def ObjectInstances_H.loadObject_cte)
@@ -2705,7 +2705,7 @@ lemma locateCTE_ko_wp_at':
    \<lbrace>\<lambda>rv. ko_wp_at' \<top> rv \<rbrace>"
   apply (clarsimp simp:locateCTE_def split_def)
   apply wp
-  apply (clarsimp simp: cte_wp_at'_def getObject_def gets_the_def  obind_def in_omonad
+  apply (clarsimp simp: cte_wp_at'_def getObject_def gets_the_def  obind_def omonad_defs
                         gets_def split_def get_def bind_def return_def readObject_def
                         ko_wp_at'_def lookupAround2_char1 assert_opt_def)
   apply (clarsimp split:option.splits
@@ -2770,11 +2770,11 @@ lemma magnitudeCheck_det:
 lemma getPDE_det:
   "ko_wp_at' ((=) (KOArch (KOPDE pde))) p s
    \<Longrightarrow> getObject p s = ({((pde::ARM_H.pde),s)},False)"
-  by (fastforce simp: getObject_def split_def gets_the_def
-                      bind_def gets_def return_def get_def projectKOs
-                      assert_opt_def fail_def obj_at'_def ko_wp_at'_def
-                      no_fail_rD[OF no_fail_r_pde_at'_readObject]
-               split: if_splits option.splits)
+  by (clarsimp simp: getObject_def split_def gets_the_def ko_wp_at'_def obj_at'_def
+                     bind_def gets_def return_def get_def projectKOs
+                     assert_opt_def fail_def typ_at'_def
+                     no_ofailD[OF no_ofail_pde_at'_readObject]
+              split: if_splits option.splits)
 
 lemma in_dom_eq:
   "m a = Some obj \<Longrightarrow> dom (\<lambda>b. if b = a then Some g else m b) = dom m"
@@ -2896,7 +2896,7 @@ lemma storePDE_det:
   apply (clarsimp simp: lookupAround2_known1 return_def alignCheck_def
                         updateObject_default_def split_def gets_the_def
                         archObjSize_def unless_def projectKO_def read_alignCheck_def
-                        projectKO_opt_pde bind_def when_def in_omonad
+                        projectKO_opt_pde bind_def when_def omonad_defs
                         is_aligned_mask[symmetric] objBits_simps)
   apply (drule magnitudeCheck_det)
     apply (simp add:objBits_simps archObjSize_def)+
@@ -3348,7 +3348,7 @@ lemma getTCB_det:
    \<Longrightarrow> getObject p s = ({(tcb,s)},False)"
   by (clarsimp simp: ko_wp_at'_def getObject_def split_def gets_the_def
                      bind_def gets_def return_def get_def fail_def assert_opt_def
-                     no_fail_rD[OF no_fail_r_tcb_at'_readObject] obj_at'_def projectKOs
+                     no_ofailD[OF no_ofail_tcb_at'_readObject] obj_at'_def projectKOs
               split: if_splits option.split)
 
 lemma threadSet_det:
@@ -3364,8 +3364,8 @@ lemma threadSet_det:
   apply (subst bind_def)
   apply (clarsimp simp:split_def)
   apply (simp add:lookupAround2_known1 bind_assoc projectKO_def gets_the_def
-    assert_opt_def updateObject_default_def projectKO_opt_tcb in_omonad)
-  apply (clarsimp simp: read_alignCheck_def in_omonad
+    assert_opt_def updateObject_default_def projectKO_opt_tcb omonad_defs)
+  apply (clarsimp simp: read_alignCheck_def omonad_defs
     alignCheck_def unless_def when_def gets_the_def
     is_aligned_mask objBits_simps)
   apply (clarsimp simp:magnitudeCheck_det bind_def)
@@ -3693,7 +3693,7 @@ lemma threadSet_gsUntypedZeroRanges_commute':
      | simp add: modify_commute updateObject_default_def alignCheck_assert obind_def
                  magnitudeCheck_assert return_commute return_commute[THEN commute_commute]
                  projectKO_def assert_commute2 assert_commute2[THEN commute_commute]
-                 assert_opt_def2 loadObject_default_def gets_the_def in_omonad
+                 assert_opt_def2 loadObject_default_def gets_the_def omonad_defs
                  read_magnitudeCheck_assert
           split: option.split prod.split)+
   apply (simp add: monad_commute_def exec_gets exec_modify)
@@ -3724,7 +3724,7 @@ lemma copyGlobalMappings_gsUntypedZeroRanges_commute':
                      magnitudeCheck_assert return_commute return_commute[THEN commute_commute]
                      projectKO_def assert_commute2 assert_commute2[THEN commute_commute]
                      assert_opt_def2 loadObject_default_def gets_the_def
-                     read_magnitudeCheck_assert in_omonad obind_def
+                     read_magnitudeCheck_assert omonad_defs obind_def
               split: option.split prod.split)+
       apply (simp add: monad_commute_def exec_gets exec_modify)
      apply wp
